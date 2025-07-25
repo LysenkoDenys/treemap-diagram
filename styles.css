@@ -18,7 +18,6 @@ body {
   padding: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
   flex-direction: column;
   font-family: 'Inter', sans-serif;
   background: rgb(42, 101, 42);
@@ -26,6 +25,34 @@ body {
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
   line-height: 1.4;
+}
+
+.navigation-menu {
+  padding: 10px 0;
+}
+
+.navigation-menu-ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation-menu-ul-li {
+  margin: 0 10px;
+}
+
+.navigation-menu-ul-li a {
+  color: rgb(174, 174, 245);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: clamp(0.7rem, 1vw, 1rem);
+}
+
+.navigation-menu-ul-li a:hover {
+  color: rgb(246, 246, 147);
+  transition: 0.5s ease-in-out;
 }
 
 h1,
@@ -41,21 +68,36 @@ h3 {
 }
 
 .container {
-  max-width: 800px;
-  min-width: 300px;
-  width: 100%;
-  max-width: 1000px;
+  max-width: 1200px;
+  width: 90%;
   padding: 1rem;
-  margin: 1rem;
+  margin: 1rem auto;
   background-color: var(--color-primary);
   border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow);
   transition: transform 0.3s ease-in-out;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .container {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
   .container {
     padding: 0.5rem;
+  }
+
+  h1,
+  h3 {
+    font-size: 1rem;
+  }
+
+  .navigation-menu-ul {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
 }
 
@@ -73,7 +115,7 @@ svg {
 #tooltip {
   background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #999;
-  color: white;
+  color: var(--color-primary);
   padding: 5px;
   border-radius: 5px;
   font-size: 12px;
