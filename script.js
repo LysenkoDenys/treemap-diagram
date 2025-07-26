@@ -21,9 +21,10 @@ const params = new URLSearchParams(window.location.search);
 const datasetKey = params.get('data') || 'videogames';
 const dataset = DATASETS[datasetKey.toLowerCase()] || DATASETS['videogames'];
 
-const w = 1200;
-const h = 800;
+const w = 1000;
+const h = 600;
 const padding = 10;
+let color;
 
 //-------------------------------------------------------
 
@@ -86,55 +87,86 @@ createHeader();
 const svg = createSVG();
 const tooltip = createTooltip();
 
-// const drawCounties = (svg, counties, educationMap, color, tooltip) => {
-//   svg
-//     .selectAll('rect')
-//     .data(counties)
-//     .join('path')
-//     .attr('class', 'tile')
-//     .attr('d', d3.geoPath())
-//     .attr('fill', (d) => {
-//       const county = educationMap.get(d.id);
-//       return county ? color(county.bachelorsOrHigher) : '#ccc';
-//     })
-//     .attr('data-fips', (d) => d.id)
-//     .attr('data-education', (d) => {
-//       const county = educationMap.get(d.id);
-//       return county ? county.bachelorsOrHigher : 0;
-//     })
-//     //-------------------------------------------------------
-//     .on('mouseover', function (event, d) {
-//       const county = educationMap.get(d.id);
-//       if (county) {
-//         tooltip
-//           .style('opacity', 1)
-//           .style('display', 'block')
-//           .attr('data-education', county.bachelorsOrHigher)
-//           .html(
-//             `<strong>${county.area_name}, ${county.state}</strong>: ${county.bachelorsOrHigher}%`
-//           )
-//           .style(
-//             'left',
-//             Math.min(event.pageX + 10, window.innerWidth - 150) + 'px'
-//           )
-//           .style('top', Math.max(event.pageY - 30, 10) + 'px');
-//       }
-//       d3.select(this)
-//         .attr('stroke', '#000')
-//         .transition()
-//         .duration(200)
-//         .attr('stroke-width', 1.5);
-//     })
+const renderTreemap = (data) => {
+  const root = d3
+    .hierarchy(data)
+    .sum((d) => d.value)
+    .sort((a, b) => b.value - a.value);
 
-//     .on('mouseout', function () {
-//       tooltip.style('opacity', 0).style('display', 'none');
-//       d3.select(this).attr('stroke', null);
-//     });
-// };
+  const treemapLayout = d3.treemap().size([w, h]).paddingInner(1);
+  treemapLayout(root);
+
+  const leaves = root.leaves();
+
+  svg
+    .selectAll('rect')
+    .data(leaves)
+    .enter()
+    .append('rect')
+    .attr('class', 'tile')
+    .attr('data-name', (d) => d.data.name)
+    .attr('data-category', (d) => d.data.category)
+    .attr('data-value', (d) => d.data.value)
+    .attr('x', (d) => d.x0)
+    .attr('y', (d) => d.y0)
+    .attr('width', (d) => d.x1 - d.x0)
+    .attr('height', (d) => d.y1 - d.y0)
+    .attr('fill', (d) => color(d.data.category || 'default'))
+    .on('mouseover', function (event, d) {
+      tooltip
+        .style('opacity', 1)
+        .style('display', 'block')
+        .attr('data-value', d.data.value)
+        .html(
+          `
+            <strong>${d.data.name}</strong><br/>
+            Category: ${d.data.category}<br/>
+            Value: ${d.data.value}
+          `
+        )
+        .style(
+          'left',
+          Math.min(event.pageX + 10, window.innerWidth - 150) + 'px'
+        )
+        .style('top', Math.max(event.pageY - 30, 10) + 'px');
+
+      d3.select(this)
+        .attr('stroke', '#000')
+        .transition()
+        .duration(200)
+        .attr('stroke-width', 1.5);
+    })
+
+    .on('mouseout', function () {
+      tooltip.style('opacity', 0).style('display', 'none');
+      d3.select(this).attr('stroke', null);
+    });
+
+  svg
+    .selectAll('text')
+    .data(leaves)
+    .enter()
+    .append('text')
+    .attr('x', (d) => d.x0 + 4)
+    .attr('y', (d) => d.y0 + 14)
+    .text((d) => d.data.name)
+    .attr('font-size', '10px')
+    .attr('fill', 'white')
+    .attr('pointer-events', 'none');
+};
 
 const getData = async () => {
   try {
     const data = await d3.json(dataset.url);
+    const categories = Array.from(
+      new Set(
+        data.children.flatMap((group) =>
+          group.children.map((item) => item.category)
+        )
+      )
+    );
+
+    color = d3.scaleOrdinal().domain(categories).range(d3.schemeCategory10);
     renderTreemap(data);
 
     drawLegend(svg, w, color);
@@ -195,3 +227,19 @@ getData();
 //     .attr('transform', `translate(0, ${legendHeight})`)
 //     .call(xAxisLegend);
 // };
+
+// {
+//   "name": "Movies",
+//   "children": [
+//     {
+//       "name": "Action",
+//       "children": [
+//         {
+//           "name": "Avatar ",
+//           "category": "Action",
+//           "value": "760505847"
+//         },
+//         {
+//           "name": "Jurassic World ",
+//           "category": "Action",
+//           "value": "652177271"
