@@ -37,19 +37,31 @@ const createNavbar = () => {
     .attr('class', 'navigation-menu-ul-li')
     .append('a')
     .attr('href', '?data=videogames')
-    .text('Video Game Data Set');
+    .text('Video Game Data Set')
+    .on('click', (event) => {
+      event.preventDefault();
+      changeDataset('videogames');
+    });
 
   ul.append('li')
     .attr('class', 'navigation-menu-ul-li')
     .append('a')
     .attr('href', '?data=movies')
-    .text('Movies Data Set');
+    .text('Movies Data Set')
+    .on('click', (event) => {
+      event.preventDefault();
+      changeDataset('movies');
+    });
 
   ul.append('li')
     .attr('class', 'navigation-menu-ul-li')
     .append('a')
     .attr('href', '?data=kickstarter')
-    .text('Kickstarter Data Set');
+    .text('Kickstarter Data Set')
+    .on('click', (event) => {
+      event.preventDefault();
+      changeDataset('kickstarter');
+    });
 };
 
 const createHeader = () => {
@@ -194,6 +206,8 @@ const renderTreemap = (data) => {
 };
 
 const getData = async () => {
+  console.log('getData() is running for:', datasetKey);
+  console.log('Dataset object:', dataset);
   try {
     const data = await d3.json(dataset.url);
     const categories = Array.from(
@@ -263,3 +277,47 @@ const drawLegend = (svg, w, color) => {
     .text((d) => d)
     .attr('font-size', '11px');
 };
+
+// we will not refresh the page to change data after fetch from API:
+function changeDataset(key) {
+  const newUrl = `?data=${key}`;
+  window.history.pushState({}, '', newUrl);
+
+  // Clear old content
+  d3.select('h1').remove();
+  d3.select('h3').remove();
+  svg.selectAll('*').remove();
+  d3.select('#legend').remove();
+
+  // Update dataset
+  const dataset = DATASETS[key.toLowerCase()] || DATASETS['videogames'];
+
+  d3.select('body')
+    .insert('h1', '.container')
+    .attr('id', 'title')
+    .text(dataset.title);
+
+  d3.select('body')
+    .insert('h3', '.container')
+    .attr('id', 'description')
+    .text(dataset.description);
+
+  // Load and render new data
+  d3.json(dataset.url)
+    .then((data) => {
+      const categories = Array.from(
+        new Set(
+          data.children.flatMap((group) =>
+            group.children.map((item) => item.category)
+          )
+        )
+      );
+      color = d3.scaleOrdinal().domain(categories).range(d3.schemeCategory10);
+
+      renderTreemap(data);
+      drawLegend(svg, w, color);
+    })
+    .catch((error) => {
+      console.error('Failed to load data:', error);
+    });
+}
