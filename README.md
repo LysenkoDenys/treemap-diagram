@@ -1,39 +1,42 @@
-🌳 Treemap Visualization
-An interactive Treemap Chart that visualizes hierarchical datasets using nested rectangles.
-This project is a part of the Data Visualization Certification from freeCodeCamp.
+# 🌳 Treemap Visualization
 
-🛠 Technologies Used
-JavaScript (ES6+)
+An interactive **Treemap Chart** that visualizes hierarchical datasets using nested rectangles.  
+This project is part of the **Data Visualization Certification** from [freeCodeCamp](https://www.freecodecamp.org/).
 
-D3.js – for rendering and interactivity
+---
 
-HTML/CSS – responsive layout & styling
+## 🛠 Technologies Used
 
-SVG – for scalable vector-based graphics
+- **JavaScript (ES6+)**
+- **D3.js** – for rendering and interactivity
+- **HTML/CSS** – for responsive layout & styling
+- **SVG** – for scalable vector-based graphics
 
-📌 Description
+---
+
+## 📌 Description
+
 This project allows users to explore and switch between three different hierarchical datasets:
 
-🎮 Video Game Sales
-
-🎬 Movie Sales
-
-💡 Kickstarter Campaigns
+- 🎮 **Video Game Sales**
+- 🎬 **Movie Sales**
+- 💡 **Kickstarter Campaigns**
 
 Each rectangle in the treemap represents an item, sized proportionally by its value.
 
-Features
-Responsive layout for desktop & mobile devices
+---
 
-Tooltip on hover showing detailed information
+## ✨ Features
 
-Color-coded by category
+- ✅ **Responsive** layout for desktop & mobile
+- 🖱️ **Tooltip** on hover with detailed info
+- 🎨 **Color-coded** by category
+- 🔁 **Interactive** navigation menu with active state highlighting
+- 🎬 **Smooth transitions** when switching datasets
 
-Interactive navigation menu with active state highlighting
+---
 
-Smooth transitions when switching datasets
-
-📁 Project Structure
+## 📁 Project Structure
 
 <pre>
 treemap-visualization/
@@ -43,28 +46,39 @@ treemap-visualization/
 └── README.md
 </pre>
 
-📊 Data Sources
-Kickstarter:
-kickstarter-funding-data.json
+---
 
-Movies:
-movie-data.json
+## 📊 Data Sources
 
-Video Games:
-video-game-sales-data.json
+- **Kickstarter:**  
+  [`kickstarter-funding-data.json`](https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/kickstarter-funding-data.json)
 
-✅ Tests & Requirements
-This project fulfills all requirements for the Treemap Diagram project in freeCodeCamp's Data Visualization curriculum.
+- **Movies:**  
+  [`movie-data.json`](https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/movie-data.json)
 
-📸 Screenshot
+- **Video Games:**  
+  [`video-game-sales-data.json`](https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json)
 
-<img width="1019" height="843" alt="Image" src="https://github.com/user-attachments/assets/bc7d2ea2-7940-45a7-b1ed-8a97087eb975" />
+---
 
-🚀 Run Locally
-Clone the repository:
+## ✅ Tests & Requirements
 
-git clone https://github.com/yourusername/treemap-visualization.git
-Navigate to the project folder:
+This project fulfills all user stories and passes the **Treemap Diagram** tests required by freeCodeCamp’s [Data Visualization Projects](https://www.freecodecamp.org/learn/data-visualization/).
+
+---
+
+## 📸 Screenshot
+
+<img width="1019" height="843" alt="Treemap Screenshot" src="https://github.com/user-attachments/assets/bc7d2ea2-7940-45a7-b1ed-8a97087eb975" />
+
+---
+
+## 🚀 Run Locally
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/treemap-visualization.git
+   ```
 
 cd treemap-visualization
 Open index.html in your browser.
