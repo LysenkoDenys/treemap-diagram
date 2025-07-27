@@ -67,7 +67,7 @@ const createSVG = () => {
     .append('div')
     .attr('class', 'container')
     .append('svg')
-    .attr('viewBox', `0 0 ${w} ${h}`)
+    .attr('viewBox', `0 0 ${w} ${h + 100}`)
     .attr('preserveAspectRatio', 'xMidYMid meet');
 };
 
@@ -143,16 +143,54 @@ const renderTreemap = (data) => {
     });
 
   svg
-    .selectAll('text')
+    .selectAll('g.tile-text')
     .data(leaves)
     .enter()
-    .append('text')
-    .attr('x', (d) => d.x0 + 4)
-    .attr('y', (d) => d.y0 + 14)
-    .text((d) => d.data.name)
-    .attr('font-size', '10px')
-    .attr('fill', 'white')
-    .attr('pointer-events', 'none');
+    .append('g')
+    .attr('class', 'tile-text')
+    .attr('transform', (d) => `translate(${d.x0 + 4}, ${d.y0 + 12})`)
+    .each(function (d) {
+      const group = d3.select(this);
+      const name = d.data.name;
+      const tileWidth = d.x1 - d.x0;
+      const maxCharsPerLine = Math.floor(tileWidth / 7); // estimate: 7px per char
+      const lines = [];
+
+      // Simple word wrap:
+      let words = name.split(/\s+/);
+      let line = '';
+
+      words.forEach((word) => {
+        if ((line + word).length <= maxCharsPerLine) {
+          line += word + ' ';
+        } else {
+          lines.push(line.trim());
+          line = word + ' ';
+        }
+      });
+      if (line) lines.push(line.trim());
+
+      // Show up to 3 lines
+      const maxLines = 3;
+      const trimmedLines = lines.slice(0, maxLines);
+
+      // If the original had more than 3 lines, add ellipsis to the last visible line
+      if (lines.length > maxLines) {
+        const lastLine = trimmedLines[trimmedLines.length - 1];
+        trimmedLines[trimmedLines.length - 1] =
+          lastLine.slice(0, maxCharsPerLine - 3).trim() + '...';
+      }
+
+      // Render each line
+      trimmedLines.forEach((lineText, i) => {
+        group
+          .append('text')
+          .text(lineText)
+          .attr('y', i * 10)
+          .attr('font-size', '10px')
+          .attr('fill', 'white');
+      });
+    });
 };
 
 const getData = async () => {
@@ -176,70 +214,52 @@ const getData = async () => {
 };
 getData();
 
-// const drawLegend = (svg, w, color) => {
-//   const legendWidth = 200;
-//   const legendHeight = 10;
-//   const legendX = (w - legendWidth) / 2;
-//   const legendY = 15;
+const drawLegend = (svg, w, color) => {
+  const categories = color.domain();
+  const itemWidth = 120; // space per legend item
+  const itemHeight = 24; // vertical spacing between rows
+  const boxSize = 18;
+  const marginTop = 10;
 
-//   const legend = svg
-//     .append('g')
-//     .attr('id', 'legend')
-//     .attr('transform', `translate(${legendX}, ${legendY})`);
+  // Max items per row based on available width
+  const itemsPerRow = Math.floor(w / itemWidth);
 
-//   const x = d3
-//     .scaleLinear()
-//     .domain([color.domain()[0], color.domain()[color.domain().length - 1]])
-//     .range([0, legendWidth]);
+  // Create legend container below treemap
+  const legend = svg
+    .append('g')
+    .attr('id', 'legend')
+    .attr('transform', `translate(0, ${h + marginTop})`);
 
-//   legend
-//     .selectAll('rect')
-//     .data(color.range())
-//     .enter()
-//     .append('rect')
-//     .attr('x', (d) => {
-//       const [x0, _] = color.invertExtent(d);
-//       return x(x0);
-//     })
-//     .attr('width', (d) => {
-//       const [x0, x1] = color.invertExtent(d);
-//       return x(x1) - x(x0);
-//     })
-//     .attr('height', legendHeight)
-//     .attr('fill', (d) => d)
-//     .attr('stroke', '#ccc');
+  // Center the whole legend group
+  const legendGroup = legend
+    .append('g')
+    .attr(
+      'transform',
+      `translate(${(w - Math.min(w, itemsPerRow * itemWidth)) / 2}, 0)`
+    );
 
-//   const xScaleLegend = d3
-//     .scaleLinear()
-//     .domain([color.domain()[0], color.domain()[color.domain().length - 1]])
-//     .range([0, legendWidth]);
+  const legendItems = legendGroup
+    .selectAll('g')
+    .data(categories)
+    .enter()
+    .append('g')
+    .attr('transform', (d, i) => {
+      const x = (i % itemsPerRow) * itemWidth;
+      const y = Math.floor(i / itemsPerRow) * itemHeight;
+      return `translate(${x}, ${y})`;
+    });
 
-//   const legendThresholds = [0, ...color.domain()];
+  legendItems
+    .append('rect')
+    .attr('class', 'legend-item')
+    .attr('width', boxSize)
+    .attr('height', boxSize)
+    .attr('fill', (d) => color(d));
 
-//   const xAxisLegend = d3
-//     .axisBottom(xScaleLegend)
-//     .tickValues(legendThresholds)
-//     .tickFormat((d) => `${d}%`);
-
-//   legend
-//     .append('g')
-//     .attr('id', 'x-axis-legend')
-//     .attr('transform', `translate(0, ${legendHeight})`)
-//     .call(xAxisLegend);
-// };
-
-// {
-//   "name": "Movies",
-//   "children": [
-//     {
-//       "name": "Action",
-//       "children": [
-//         {
-//           "name": "Avatar ",
-//           "category": "Action",
-//           "value": "760505847"
-//         },
-//         {
-//           "name": "Jurassic World ",
-//           "category": "Action",
-//           "value": "652177271"
+  legendItems
+    .append('text')
+    .attr('x', boxSize + 6)
+    .attr('y', boxSize - 5)
+    .text((d) => d)
+    .attr('font-size', '11px');
+};
