@@ -64,11 +64,17 @@ const createNavbar = () => {
     });
 };
 
-const createHeader = () => {
-  d3.select('body').append('h1').attr('id', 'title').text(dataset.title);
+const renderHeader = (dataset) => {
+  d3.select('#title').remove();
+  d3.select('#description').remove();
 
   d3.select('body')
-    .append('h3')
+    .insert('h1', '.container')
+    .attr('id', 'title')
+    .text(dataset.title);
+
+  d3.select('body')
+    .insert('h3', '.container')
     .attr('id', 'description')
     .text(dataset.description);
 };
@@ -95,7 +101,7 @@ const createTooltip = () => {
 };
 
 createNavbar();
-createHeader();
+renderHeader(dataset);
 const svg = createSVG();
 const tooltip = createTooltip();
 
@@ -205,6 +211,11 @@ const renderTreemap = (data) => {
     });
 };
 
+const clearVisualization = () => {
+  svg.selectAll('*').remove(); // clear SVG (tree map)
+  d3.select('#legend').remove(); // clear legend
+};
+
 const getData = async () => {
   console.log('getData() is running for:', datasetKey);
   console.log('Dataset object:', dataset);
@@ -283,27 +294,12 @@ function changeDataset(key) {
   const newUrl = `?data=${key}`;
   window.history.pushState({}, '', newUrl);
 
-  // Clear old content
-  d3.select('h1').remove();
-  d3.select('h3').remove();
-  svg.selectAll('*').remove();
-  d3.select('#legend').remove();
+  const newDataset = DATASETS[key.toLowerCase()] || DATASETS['videogames'];
 
-  // Update dataset
-  const dataset = DATASETS[key.toLowerCase()] || DATASETS['videogames'];
+  renderHeader(newDataset);
+  clearVisualization();
 
-  d3.select('body')
-    .insert('h1', '.container')
-    .attr('id', 'title')
-    .text(dataset.title);
-
-  d3.select('body')
-    .insert('h3', '.container')
-    .attr('id', 'description')
-    .text(dataset.description);
-
-  // Load and render new data
-  d3.json(dataset.url)
+  d3.json(newDataset.url)
     .then((data) => {
       const categories = Array.from(
         new Set(
