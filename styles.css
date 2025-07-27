@@ -16,9 +16,9 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  display: flex;
+  /* display: flex;
   justify-content: center;
-  flex-direction: column;
+  flex-direction: column; */
   font-family: 'Inter', sans-serif;
   background: rgb(42, 101, 42);
   color: var(--color-secondary);
@@ -37,6 +37,8 @@ body {
   justify-content: center;
   margin: 0;
   padding: 0;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .navigation-menu-ul-li {
@@ -100,6 +102,31 @@ h3 {
     align-items: center;
     gap: 10px;
   }
+
+  .navigation-menu-ul-li a {
+    font-size: 0.9rem;
+  }
+
+  #tooltip {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .navigation-menu-ul-li a {
+    font-size: 0.8rem;
+  }
+
+  h1,
+  h3 {
+    font-size: 0.9rem;
+  }
+}
+
+.navigation-menu-ul-li a.active-link {
+  font-weight: bold;
+  color: #007acc;
+  text-decoration: underline;
 }
 
 .container:hover {
@@ -122,4 +149,5 @@ svg {
   font-size: 12px;
   pointer-events: none;
   transition: opacity 0.3s ease-in-out;
+  max-width: 250px;
 }

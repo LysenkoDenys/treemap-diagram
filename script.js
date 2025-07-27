@@ -64,7 +64,19 @@ const createNavbar = () => {
     });
 };
 
-const renderHeader = (dataset) => {
+const updateActiveLink = (key) => {
+  d3.selectAll('.navigation-menu-ul-li a').classed('active-link', false);
+
+  d3.selectAll('.navigation-menu-ul-li a')
+    .filter(function () {
+      return this.href.includes(`?data=${key}`);
+    })
+    .classed('active-link', true);
+};
+
+updateActiveLink(datasetKey);
+
+const updateHeader = (dataset) => {
   d3.select('#title').remove();
   d3.select('#description').remove();
 
@@ -101,7 +113,7 @@ const createTooltip = () => {
 };
 
 createNavbar();
-renderHeader(dataset);
+updateHeader(dataset);
 const svg = createSVG();
 const tooltip = createTooltip();
 
@@ -296,8 +308,9 @@ function changeDataset(key) {
 
   const newDataset = DATASETS[key.toLowerCase()] || DATASETS['videogames'];
 
-  renderHeader(newDataset);
+  updateHeader(newDataset);
   clearVisualization();
+  updateActiveLink(key); // mark the link
 
   d3.json(newDataset.url)
     .then((data) => {
